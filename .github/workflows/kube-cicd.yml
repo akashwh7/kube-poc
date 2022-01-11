@@ -36,9 +36,9 @@ jobs:
     # Setup Kube config credentials (Base encode config file and store it in github secrets: $cat ~/.kube/config | base64):
     - name: Create kubeconfig
       run: |-
-        mkdir ~/.kube
-        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ~/.kube/config
-        cat ~/.kube/config  
+        mkdir ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+        cat ${HOME}/.kube/config  
 
     # # Set Kubeconfig context
     # - name: Use context
