@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: 2048-app
+    labels:
+        app: "2048"
+spec:
+    replicas: 3
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 1
+    selector:
+        matchLabels:
+            app: "2048"
+    template:
+        metadata:
+            labels:
+                app: "2048"
+        spec:
+            containers:
+            - name: "2048-game"
+              image: kubernetespoc.jfrog.io/REPOSITORY/IMAGE:TAG
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+# To check if liveness and readiness probes are working execute the following command and describe pods: kubectl exec -it <POD_NAME> -- rm /usr/share/nginx/html/healthy                
+              livenessProbe: 
+                httpGet: 
+                  path: /healthy
+                  port: 80
+                initialDelaySeconds: 2 #Default 0 
+                periodSeconds: 2 #Default 10 
+                timeoutSeconds: 1 #Default 1 
+                successThreshold: 1 #Default 1 
+                failureThreshold: 3 #Default 3
+              readinessProbe: 
+                httpGet: 
+                  path: /healthy
+                  port: 80
+                initialDelaySeconds: 2
+                periodSeconds: 2 
+# Following parameters will use the JFROG registry credentials stored in cluster to pull container images                 
+            imagePullSecrets:
+                - name: regcred  
