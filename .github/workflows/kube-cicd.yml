@@ -46,7 +46,7 @@ jobs:
     # Docker Login JFROG SaaS
     - name: Docker Login
       run: |
-        docker login -u "${{ secrets.JFROG_USERNAME }}" -p "${{ secrets.JFROG_PASSWORD }}" kubespoc.jfrog.io
+        docker login -u "${{ secrets.JFROG_USERNAME }}" -p "${{ secrets.JFROG_PASSWORD }}" kubespoc.jfrog.io --password-stdin
 
 
 
