@@ -38,12 +38,6 @@ jobs:
       run: |-
         mkdir -p ${HOME}/.kube && echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config && cat ${HOME}/.kube/config
 
-
-    # # Set Kubeconfig context
-    # - name: Use context
-    #   run: kubectl config use-context kube-poc
-
-
     # Docker Login JFROG SaaS
     - name: Docker Login
       run: |
