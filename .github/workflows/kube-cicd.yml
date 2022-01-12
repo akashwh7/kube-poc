@@ -77,7 +77,7 @@ jobs:
     - name: Deploy
       run: |-
         ./kustomize edit set image REPOSITORY/IMAGE:TAG=$REPOSITORY/$IMAGE:$GITHUB_SHA
-        ./kustomize build . | kubectl apply -f -
+        ./kustomize build . | kubectl --insecure-skip-tls-verify apply -f -
         kubectl --insecure-skip-tls-verify rollout status deployment/$DEPLOYMENT_NAME
         kubectl --insecure-skip-tls-verify get services -o wide
 
