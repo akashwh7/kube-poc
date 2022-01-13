@@ -8,7 +8,7 @@
 #
 # For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke
 #
-# Made changes accordingly ok
+# Made changes accordingly
 
 
 name: Build and Deploy to Kubernetes
@@ -68,10 +68,10 @@ jobs:
       run: |-
         docker push "$REPOSITORY/$IMAGE:$GITHUB_SHA"
 
-    # Create kubernetes secret to pull images from JFROG private registry
-    - name: Create JFROG kubernetes secret
-      run: |
-        kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+    # # Create kubernetes secret to pull images from JFROG private registry
+    # - name: Create JFROG kubernetes secret
+    #   run: |
+    #     kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
