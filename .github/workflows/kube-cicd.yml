@@ -21,7 +21,7 @@ on:
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update to deployment name
   IMAGE: 2048 # TODO: update to image name
-  REPOSITORY: kubepoc.jfrog.io/default-docker-virtual # TODO: update to JFROG repo name
+  REPOSITORY: kubepoc.jfrog.io/default-docker-virtual # Full repo name 
   REPO_SHORT: kubepoc.jfrog.io # For docker login (JFROG)
 
 jobs:
@@ -68,10 +68,15 @@ jobs:
       run: |-
         docker push "$REPOSITORY/$IMAGE:$GITHUB_SHA"
 
-    # # Create kubernetes secret to pull images from JFROG private registry
-    # - name: Create JFROG kubernetes secret
-    #   run: |
-    #     kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+  # Create kubernetes secret to pull images from JFROG private registry
+    - name: Create JFROG kubernetes secret
+      run: |
+        kubectl --insecure-skip-tls-verify delete secret regcred
+        
+    # Create kubernetes secret to pull images from JFROG private registry
+    - name: Create JFROG kubernetes secret
+      run: |
+        kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
