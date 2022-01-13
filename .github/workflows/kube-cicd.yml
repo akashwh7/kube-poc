@@ -71,7 +71,7 @@ jobs:
     # Create kubernetes secret to pull images from JFROG private registry
     - name: Create JFROG kubernetes secret
       run: |
-        kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+        kubectl --insecure-skip-tls-verify apply secret docker-registry regcred --docker-server=kubepoc.jfrog.io --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
