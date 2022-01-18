@@ -21,7 +21,7 @@ spec:
         spec:
             containers:
             - name: "2048-game"
-              image: REPO_FULL/IMAGE:TAG
+              image: REPO/IMAGE:TAG
               ports:
                 - containerPort: 80
               resources:
