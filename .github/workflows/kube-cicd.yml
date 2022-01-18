@@ -21,8 +21,7 @@ on:
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update to deployment name
   IMAGE: 2048 # TODO: update to image name
-  REPO: kubepoc.jfrog.io/default-docker-virtual # Full repo name 
-  # REPO_SHORT: kubepoc.jfrog.io # For docker login (JFROG)
+  REPO: kubepoc.jfrog.io/default-docker-virtual # Full repo name
 
 jobs:
   setup-build-publish-deploy:
@@ -41,13 +40,15 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
         cat ${HOME}/.kube/config
 
-
+    # # Set Kubeconfig context:
+    # kubectl config set-context --current --namespace=<insert-namespace-name-here>
+    # # Disable cert checking for the dev cluster entry
+    # kubectl config set-cluster default --insecure-skip-tls-verify=true
     # # Set Kubeconfig context
     # - name: Use context
     #   run: kubectl config use-context kube-poc
 
-    # Disable cert checking for the dev cluster entry
-    # kubectl config set-cluster default --insecure-skip-tls-verify=true
+
 
 
     # Docker Login JFROG SaaS
@@ -74,12 +75,12 @@ jobs:
   # # Create kubernetes secret to pull images from JFROG private registry
   #   - name: Create JFROG kubernetes secret
   #     run: |
-  #       kubectl --insecure-skip-tls-verify delete secret regcred
+  #       kubectl delete secret regcred
 
     # # Create kubernetes secret to pull images from JFROG private registry
     # - name: Create JFROG kubernetes secret
     #   run: |
-    #     kubectl --insecure-skip-tls-verify create secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+    #     kubectl create secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
@@ -98,9 +99,9 @@ jobs:
     - name: Deploy
       run: |-
         ./kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
-        ./kustomize build . | kubectl --insecure-skip-tls-verify apply -f -
-        kubectl --insecure-skip-tls-verify rollout status deployment/$DEPLOYMENT_NAME
-        kubectl --insecure-skip-tls-verify get services -o wide
+        ./kustomize build . | kubectl apply -f -
+        kubectl rollout status deployment/$DEPLOYMENT_NAME
+        kubectl get services -o wide
 
     # - name: Deploy
     #   run: |-
