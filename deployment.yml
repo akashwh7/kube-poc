@@ -1,3 +1,5 @@
+# Sample Deployment: Deploys a Sample 2048 game app
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,2 +1,2 @@
 # kube-poc
-Kubeernetes POC repo for on-prem deployments
+Kubernetes POC repo for on-prem deployments

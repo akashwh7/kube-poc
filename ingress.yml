@@ -1,3 +1,4 @@
+# Creates an ingress for the app 2048
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
