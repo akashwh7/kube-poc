@@ -41,12 +41,13 @@ jobs:
         cat ${HOME}/.kube/config
 
     # # Set Kubeconfig context:
+    # kubectl config set-context <CONTEXT_NAME> --namespace=<NAMESPACE> --cluster=<CLUSTER_NAME> --user=<USER_NAME>
     # kubectl config set-context --current --namespace=<insert-namespace-name-here>
     # # Disable cert checking for the dev cluster entry
     # kubectl config set-cluster default --insecure-skip-tls-verify=true
-    # # Set Kubeconfig context
-    # - name: Use context
-    #   run: kubectl config use-context kube-poc
+    # Set Kubeconfig context
+    - name: Use context
+      run: kubectl config use-context kube-poc
 
 
 
@@ -73,7 +74,7 @@ jobs:
         docker push "$REPO/$IMAGE:$GITHUB_SHA"
 
   # # Create kubernetes secret to pull images from JFROG private registry
-  #   - name: Create JFROG kubernetes secret
+  #   - name: Delete JFROG kubernetes secret if already present
   #     run: |
   #       kubectl delete secret regcred
 
