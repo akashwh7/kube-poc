@@ -1,14 +1,14 @@
-# This workflow will build a docker container, publish it to Jfrog Artifactory Registry, and deploy it to GKE when there is a push to the master branch.
+# This workflow will build a docker container, publish it to Jfrog Artifactory Registry, and deploy it to Kubernetes Cluster when there is a push to the specified branch (main branch).
 #
 # To configure this workflow:
 #
-# 1. Ensure that your repository contains the necessary configuration for your Google Kubernetes Engine cluster, including deployment.yml, kustomization.yml, service.yml, etc.
-
-# 2. Add secret the cluster to pull image from JFROG Registry (Refer: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+# 1. Create Kubeconfig with IP, tls settings, context (username, cluster-name, namespace) and base64 encode config file to store it as a secret in KUBE_CONFIG
 #
-# For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke
+# 2. Ensure that KUBE_CONFIG, JFROG_USERNAME, JFROG_PASSWORD github secrets have been added to the repo.
 #
-# Made changes accordingly
+# 3. [Pre-requisite] Add secret to the cluster to pull image from JFROG Registry (Refer: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+#
+# 4. Edit TODO items in the code accordingly 
 
 
 name: Build and Deploy to Kubernetes
@@ -21,7 +21,7 @@ on:
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update to deployment name
   IMAGE: 2048 # TODO: update to image name
-  REPO: kubepoc.jfrog.io/default-docker-virtual # Full repo name
+  REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Full repo name
 
 jobs:
   setup-build-publish-deploy:
@@ -78,10 +78,10 @@ jobs:
   #     run: |
   #       kubectl delete secret regcred
 
-    # Create kubernetes secret to pull images from JFROG private registry
-    - name: Create JFROG kubernetes secret
-      run: |
-        kubectl create secret docker-registry regcred --docker-server=$REPO --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+    # # Create kubernetes secret to pull images from JFROG private registry
+    # - name: Create JFROG kubernetes secret
+    #   run: |
+    #     kubectl create secret docker-registry regcred --docker-server=$REPO --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
