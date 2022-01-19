@@ -5,6 +5,11 @@
 # 1. Create Kubeconfig with IP, tls settings, context (username, cluster-name, namespace) and base64 encode config file to store it as a secret in KUBE_CONFIG
 #
 # 2. Ensure that KUBE_CONFIG, JFROG_USERNAME, JFROG_PASSWORD github secrets have been added to the repo.
+#  # Set Kubeconfig context:
+#  kubectl config set-context <CONTEXT_NAME> --namespace=<NAMESPACE> --cluster=<CLUSTER_NAME> --user=<USER_NAME>
+#  kubectl config set-context --current --namespace=<insert-namespace-name-here>
+#  # Disable cert checking for the dev cluster entry
+#  kubectl config set-cluster default --insecure-skip-tls-verify=true
 #
 # 3. [Pre-requisite] Add secret to the cluster to pull image from JFROG Registry (Refer: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
 #
@@ -19,9 +24,9 @@ on:
       - main
 
 env:
-  DEPLOYMENT_NAME: 2048-app # TODO: update to deployment name
+  DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
   IMAGE: 2048 # TODO: update to image name
-  REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Full repo name
+  REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Update full repo name
 
 jobs:
   setup-build-publish-deploy:
@@ -40,11 +45,7 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
         cat ${HOME}/.kube/config
 
-    # # Set Kubeconfig context:
-    # kubectl config set-context <CONTEXT_NAME> --namespace=<NAMESPACE> --cluster=<CLUSTER_NAME> --user=<USER_NAME>
-    # kubectl config set-context --current --namespace=<insert-namespace-name-here>
-    # # Disable cert checking for the dev cluster entry
-    # kubectl config set-cluster default --insecure-skip-tls-verify=true
+
     # Set Kubeconfig context
     - name: Use context
       run: kubectl config use-context kube-poc
@@ -59,7 +60,7 @@ jobs:
 
 
 
-    # Build the Docker image
+    # Build the Docker image / Dockerize
     - name: Build
       run: |-
         docker build \
@@ -73,21 +74,14 @@ jobs:
       run: |-
         docker push "$REPO/$IMAGE:$GITHUB_SHA"
 
-  # # Create kubernetes secret to pull images from JFROG private registry
-  #   - name: Delete JFROG kubernetes secret if already present
-  #     run: |
-  #       kubectl delete secret regcred
+
 
     # # Create kubernetes secret to pull images from JFROG private registry
     # - name: Create JFROG kubernetes secret
     #   run: |
     #     kubectl create secret docker-registry regcred --docker-server=$REPO --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
-      # Another one line method to create secret:
-      # run: |-
-      #   kubectl create secret generic regcred \
-      #   --from-file=.dockerconfigjson=<path/to/.docker/config.json> \
-      #   --type=kubernetes.io/dockerconfigjson  
+      
 
 
     # Set up kustomize
@@ -104,8 +98,4 @@ jobs:
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
 
-    # - name: Deploy
-    #   run: |-
-    #     kubectl apply -f 2048.yml
-    #     kubectl rollout status deployment/$DEPLOYMENT_NAME
-    #     kubectl get services -o wide
+

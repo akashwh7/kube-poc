@@ -15,5 +15,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- k8s.yml
+- deployment.yml
+- ingress.yml
+- service.yml
+- hpa.yml
+
 
