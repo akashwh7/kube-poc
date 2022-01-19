@@ -78,10 +78,10 @@ jobs:
   #     run: |
   #       kubectl delete secret regcred
 
-    # # Create kubernetes secret to pull images from JFROG private registry
-    # - name: Create JFROG kubernetes secret
-    #   run: |
-    #     kubectl create secret docker-registry regcred --docker-server=$REPO_SHORT --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
+    # Create kubernetes secret to pull images from JFROG private registry
+    - name: Create JFROG kubernetes secret
+      run: |
+        kubectl create secret docker-registry regcred --docker-server=$REPO --docker-username="${{ secrets.JFROG_USERNAME }}" --docker-password="${{ secrets.JFROG_PASSWORD }}"
 
       # Another one line method to create secret:
       # run: |-
