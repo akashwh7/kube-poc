@@ -4,7 +4,7 @@ metadata:
   name: twenty-forty-eight-svc
 spec:
   selector:
-    app: 2048-app
+    app: "2048"
   ports:
     - protocol: TCP
       port: 80
