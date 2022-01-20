@@ -23,7 +23,7 @@ spec:
         spec:
             containers:
             - name: "2048-game"
-              image: REPO/IMAGE:TAG
+              image: REPO/IMAGE:TAG # This field gets updated by Kustomization.
               ports:
                 - containerPort: 80
               resources:
