@@ -17,7 +17,7 @@ spec:
           service:
             name: twenty-forty-eight-svc
             port:
-              number: 8080
+              number: 80
       - path: /v2
         pathType: Prefix
         backend:
