@@ -118,7 +118,7 @@ jobs:
     - name: Deploy
       run: |-
         kubectl kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA ./
-        kubectl kustomize build . | kubectl apply -f -        
+        kubectl kustomize build ./       
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
 
