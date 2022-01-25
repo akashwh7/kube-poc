@@ -114,6 +114,11 @@ jobs:
         curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
         chmod u+x ./kustomize
 
+# Create Docker secrets
+    - name: Create secrets
+      run: |-
+        echo "${{ secrets.REGCRED }}" | base64 --decode > ${HOME}/.dockerconfigjson  
+
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
       run: |-
