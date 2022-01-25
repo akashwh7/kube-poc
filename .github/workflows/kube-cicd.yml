@@ -12,7 +12,7 @@
 #    # Disable cert checking for the dev cluster entry
 #    kubectl config set-cluster default --insecure-skip-tls-verify=true
 # 
-# [FOR GKE (Google Kubernetes Engine):]
+# [FOR GKE (Google Kubernetes Engine): Uncomment GKE code and comment Kube config code]
 #   1. Set up secrets in your workspace: GKE_PROJECT with the name of the project and GKE_SA_KEY with the Base64 encoded JSON service account key (https://github.com/GoogleCloudPlatform/github-actions/tree/docs/service-account-key/setup-gcloud#inputs).
 #   2. Change the values for the GKE_ZONE, GKE_CLUSTER  environment variables (below).
 #   3. For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke
