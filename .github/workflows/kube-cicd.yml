@@ -11,6 +11,11 @@
 #    kubectl config set-context --current --namespace=<insert-namespace-name-here>
 #    # Disable cert checking for the dev cluster entry
 #    kubectl config set-cluster default --insecure-skip-tls-verify=true
+# 
+# [FOR GKE (Google Kubernetes Engine):]
+#   1. Set up secrets in your workspace: GKE_PROJECT with the name of the project and GKE_SA_KEY with the Base64 encoded JSON service account key (https://github.com/GoogleCloudPlatform/github-actions/tree/docs/service-account-key/setup-gcloud#inputs).
+#   2. Change the values for the GKE_ZONE, GKE_CLUSTER  environment variables (below).
+#   3. For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke
 #
 # 3. Add secret to the cluster to pull image from JFROG Registry (Refer: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
 #
@@ -28,6 +33,9 @@ env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
   IMAGE: 2048 # TODO: update to image name
   REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Update full repo name
+  # GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT_ID }} # TODO Update GKE Project ID
+  # GKE_CLUSTER: kube-cluster    # TODO: update to cluster name
+  # GKE_ZONE: asia-south1-a   # TODO: update to cluster zone
 
 jobs:
   setup-build-publish-deploy:
@@ -35,9 +43,24 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
+
+    # # GKE: Setup gcloud CLI
+    # - uses: google-github-actions/setup-gcloud@v0.2.0
+    #   with:
+    #     service_account_key: ${{ secrets.GKE_SA_KEY }}
+    #     project_id: ${{ secrets.GKE_PROJECT_ID }}
+
+    # # GKE: Get the GKE credentials so we can deploy to the cluster
+    # - uses: google-github-actions/get-gke-credentials@v0.2.1
+    #   with:
+    #     cluster_name: ${{ env.GKE_CLUSTER }}
+    #     location: ${{ env.GKE_ZONE }}
+    #     credentials: ${{ secrets.GKE_SA_KEY }}              
 
     # Setup Kube config credentials (Base encode config file and store it in github secrets: $cat ~/.kube/config | base64):
     - name: Create kubeconfig
