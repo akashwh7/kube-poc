@@ -117,7 +117,7 @@ jobs:
 # Create Docker secrets
     - name: Create secrets
       run: |-
-        echo "${{ secrets.REGCRED }}" | base64 --decode > secrets/.dockerconfigjson  
+        echo "${{ secrets.REGCRED }}" | base64 --decode > .dockerconfigjson  
 
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
