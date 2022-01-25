@@ -22,7 +22,7 @@ resources:
 secretGenerator:
   - name: regcred
     files:
-      - .dockerconfigjson=.dockerconfigjson
+      - .dockerconfigjson=secrets/.dockerconfigjson
     type: kubernetes.io/dockerconfigjson
 
 
