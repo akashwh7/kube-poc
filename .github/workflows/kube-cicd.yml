@@ -5,7 +5,7 @@
 # [Pre-requisites]
 # 1. Create Kubeconfig with IP, tls settings, context (username, cluster-name, namespace) and base64 encode config file to store it as a secret in KUBE_CONFIG
 #
-# 2. Ensure that KUBE_CONFIG, JFROG_USERNAME, JFROG_PASSWORD github secrets have been added to the repo.
+# 2. Ensure that KUBE_CONFIG and DOCKER_CONFIG github secrets have been added to the repo.
 #    # Set Kubeconfig context:
 #    kubectl config set-context <CONTEXT_NAME> --namespace=<NAMESPACE> --cluster=<CLUSTER_NAME> --user=<USER_NAME>
 #    kubectl config set-context --current --namespace=<insert-namespace-name-here>
@@ -125,8 +125,8 @@ jobs:
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
       run: |-
-        ./kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
-        ./kustomize build . | kubectl apply -f -
+        kubectl kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
+        kubectl kustomize . | kubectl apply -f -
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
 
