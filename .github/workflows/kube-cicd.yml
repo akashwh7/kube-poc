@@ -67,7 +67,7 @@ jobs:
       run: |-
         mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
-        cat ${HOME}/.kube/config
+        # cat ${HOME}/.kube/config
 
 
 # Set Kube config context
@@ -80,7 +80,7 @@ jobs:
       run: |-
         mkdir -p ${HOME}/.kube
         echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > ${HOME}/.docker/config.json
-        cat ${HOME}/.docker/config.json
+        # cat ${HOME}/.docker/config.json
 
 
 
