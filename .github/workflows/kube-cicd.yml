@@ -125,7 +125,7 @@ jobs:
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
       run: |-
-        kubectl kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
+        kubectl kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA -f kustomization.yml
         kubectl kustomize . | kubectl apply -f -
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
