@@ -79,8 +79,10 @@ jobs:
 
     # Docker Login JFROG SaaS
     - name: Docker Login
-      run: |
-        docker login -u "${{ secrets.JFROG_USERNAME }}" -p "${{ secrets.JFROG_PASSWORD }}" $REPO
+      run: |-
+        mkdir -p ${HOME}/.kube
+        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > ${HOME}/.docker/config.json
+        cat ${HOME}/.docker/config.json
 
 
 
@@ -118,7 +120,7 @@ jobs:
     - name: Create secrets
       run: |-
         mkdir -p ${HOME}/secrets
-        echo "${{ secrets.REGCRED }}" | base64 --decode > /secrets/.dockerconfigjson  
+        echo "${{ secrets.REGCRED }}" | base64 --decode > .dockerconfigjson  
 
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
