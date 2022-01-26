@@ -119,8 +119,8 @@ jobs:
 # Create Docker secrets
     - name: Create secrets
       run: |-
-        mkdir -p ${HOME}/secrets
-        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > ${HOME}/secrets/.dockerconfigjson  
+        mkdir -p secrets
+        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
 
     # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
