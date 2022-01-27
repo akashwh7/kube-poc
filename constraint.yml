@@ -1,3 +1,5 @@
+# NOTE: Constraints require cluster admin permissions for the user
+
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
