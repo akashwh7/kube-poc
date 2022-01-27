@@ -27,7 +27,7 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - ${{ env.ENV_BRANCH }}
+      - ${{ github.ref }}
 
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
