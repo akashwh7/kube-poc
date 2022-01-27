@@ -19,8 +19,8 @@ resources:
 - ingress.yml
 - service.yml
 - hpa.yml
-- template.yml
-- constraint.yml
+- opa-template.yml
+- opa-constraint.yml
 
 secretGenerator:
   - name: regcred
