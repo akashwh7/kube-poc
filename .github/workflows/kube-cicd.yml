@@ -83,7 +83,6 @@ jobs:
         # cat ${HOME}/.docker/config.json
 
 
-
 # Build the Docker image / Dockerize
     - name: Build
       run: |-
@@ -92,6 +91,7 @@ jobs:
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
+
 
 # Push the Docker image to JFROG Artifactory Container Registry
     - name: Publish
@@ -105,11 +105,13 @@ jobs:
         curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
         chmod u+x ./kustomize
 
+
 # Create regcred secrets
     - name: Create regcred secrets for cluster
       run: |-
         mkdir -p secrets
         echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
+
 
 # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
