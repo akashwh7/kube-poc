@@ -73,7 +73,7 @@ jobs:
 
 # Set Kube config context
     - name: Use context
-      run: kubectl config use-context $KUBE_CONFIG
+      run: kubectl config use-context $KUBE_CONTEXT
 
 
 # Create Dockerconfig
