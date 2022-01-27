@@ -33,6 +33,7 @@ env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
   IMAGE: 2048 # TODO: update to image name
   REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Update full repo name
+  KUBE_CONTEXT: kube-poc
   # GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT_ID }} # TODO Update GKE Project ID
   # GKE_CLUSTER: kube-cluster    # TODO: update to cluster name
   # GKE_ZONE: asia-south1-a   # TODO: update to cluster zone
@@ -72,7 +73,7 @@ jobs:
 
 # Set Kube config context
     - name: Use context
-      run: kubectl config use-context kube-poc
+      run: kubectl config use-context $KUBE_CONFIG
 
 
 # Create Dockerconfig
