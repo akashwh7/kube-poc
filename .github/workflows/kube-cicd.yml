@@ -27,7 +27,7 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - kube-test
+      - ${{ env.ENV_BRANCH }}
 
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
