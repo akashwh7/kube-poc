@@ -28,6 +28,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+        
 
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
@@ -44,8 +48,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
-
+# Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
+# Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -118,7 +124,8 @@ jobs:
     - name: Deploy
       run: |-
         ./kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
-        ./kustomize build . | kubectl apply -f -
+        # ./kustomize build . | kubectl apply -f -
+        kubectl apply -k .
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
 
