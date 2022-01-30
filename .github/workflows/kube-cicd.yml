@@ -109,13 +109,11 @@ jobs:
 # Set up kustomize
     - name: Set up Kustomize
       run: |-
-        curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
-        grep browser_download |\
-        grep $opsys |\
-        cut -d '"' -f 4 |\
-        xargs curl -O -L
-        mv kustomize_*_${opsys}_amd64 kustomize
-        chmod u+x kustomize
+        # The following script detects your OS and downloads the appropriate kustomize binary to your current working directory.
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        # The following script downloads the specified kustomize binary version to your current working directory.
+        # curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+        # chmod u+x ./kustomize
 
 
 # Create regcred secrets
