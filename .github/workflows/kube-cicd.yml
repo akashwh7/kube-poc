@@ -73,7 +73,7 @@ jobs:
 
 # Dockerize
   dockerize:
-    name: Setup, Build, Publish, and Deploy
+    name: Dockerize
     needs: setup-build-publish-deploy
     runs-on: ubuntu-latest
     steps:
