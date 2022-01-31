@@ -122,8 +122,6 @@ jobs:
     name: Deploy to Kubernetes production
     runs-on: ubuntu-latest
     needs: dockerize
-    environment:
-      name: production
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
