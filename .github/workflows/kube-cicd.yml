@@ -73,7 +73,7 @@ jobs:
 # Job 2: Dockerize
   dockerize:
     name: Dockerize
-    needs: setup-build-publish-deploy
+    needs: setup-build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
