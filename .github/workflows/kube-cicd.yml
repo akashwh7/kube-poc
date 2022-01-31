@@ -27,7 +27,7 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - main
+      - test1
   pull_request:
     branches:
       - main
@@ -123,6 +123,26 @@ jobs:
         echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
 
 
+# # Deploy the Docker image to the Kubernetes cluster
+#     - name: Deploy
+#       run: |-
+#         ./kustomize edit set image REPO/IMAGE:TAG=$REPO/$IMAGE:$GITHUB_SHA
+#         ./kustomize build . | kubectl apply -f -
+#         kubectl rollout status deployment/$DEPLOYMENT_NAME
+#         kubectl get services -o wide
+
+    
+  deploy-to-prod:
+    name: Deploy to Kubernetes production
+    runs-on: ubuntu-latest
+    needs: dockerize
+    environment:
+      name: production
+    steps:
+    - name: Checkout the branch ${{ GITHUB.REF }}'
+      uses: actions/checkout@v2
+    - name: Deploy to production
+    
 # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
       run: |-
@@ -130,5 +150,3 @@ jobs:
         ./kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
-
-
