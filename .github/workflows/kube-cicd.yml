@@ -50,7 +50,6 @@ jobs:
 
 # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
@@ -70,7 +69,6 @@ jobs:
     #     credentials: ${{ secrets.GKE_SA_KEY }}              
 
 
-
 # Job 2: Dockerize
   dockerize:
     name: Dockerize
@@ -78,14 +76,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
-      uses: actions/checkout@v2    
-# Create Dockerconfig
+      uses: actions/checkout@v2
+    
+    # Create Dockerconfig
     - name: Create Dockerconfig
       run: |-
         mkdir -p ${HOME}/.kube
         echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > ${HOME}/.docker/config.json
         # cat ${HOME}/.docker/config.json
-
 
     # Build the Docker using Dockerfile
     - name: Build
@@ -95,13 +93,11 @@ jobs:
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
-
-
+          
 # Push the Docker image to JFROG Artifactory Container Registry
     - name: Publish
       run: |-
         docker push "$REPO/$IMAGE:$GITHUB_SHA"
-
 
 
 # Job 3: Deploy to Prod    
@@ -120,20 +116,7 @@ jobs:
         mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
         # cat ${HOME}/.kube/config
-# #Create Dockerconfig
-#     - name: Create Dockerconfig
-#       run: |-
-#         mkdir -p ${HOME}/.kube
-#         echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > ${HOME}/.docker/config.json
-#         # cat ${HOME}/.docker/config.json
-# Set up kustomize
-    - name: Set up Kustomize
-      run: |-
-        # The following script detects your OS and downloads the appropriate kustomize binary to your current working directory.
-        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-        # The following script downloads the specified kustomize binary version to your current working directory.
-        # curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-        # chmod u+x ./kustomize
+
 # Set Kube config context
     - name: Use context
       run: kubectl config use-context $KUBE_CONTEXT
@@ -142,7 +125,16 @@ jobs:
     - name: Create regcred secrets for cluster
       run: |-
         mkdir -p secrets
-        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
+        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson
+
+# Set up kustomize
+    - name: Set up Kustomize
+      run: |-
+        # The following script detects your OS and downloads the appropriate kustomize binary to your current working directory.
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        # The following script downloads the specified kustomize binary version to your current working directory.
+        # curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+        # chmod u+x ./kustomize
 
 # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
