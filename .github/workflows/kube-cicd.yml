@@ -135,6 +135,7 @@ jobs:
   deploy-to-prod:
     name: Deploy to Kubernetes production
     runs-on: ubuntu-latest
+    needs: setup-build-publish-deploy
     environment:
       name: production
     steps:
