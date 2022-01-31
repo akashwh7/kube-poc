@@ -30,7 +30,7 @@ on:
       - test1
   pull_request:
     branches:
-      - main
+      - test1
         
 
 env:
