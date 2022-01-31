@@ -20,7 +20,7 @@
 # 3. Add secret to the cluster to pull image from JFROG Registry (Refer: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
 #
 # 4. Edit TODO items in the code accordingly 
-# demo test
+# 
 
 
 name: Build and Deploy to Kubernetes
