@@ -140,7 +140,6 @@ jobs:
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
-    - name: Deploy to production
     
 # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
