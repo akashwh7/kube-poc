@@ -69,19 +69,16 @@ jobs:
     #     location: ${{ env.GKE_ZONE }}
     #     credentials: ${{ secrets.GKE_SA_KEY }}              
 
-# Setup Kube config credentials (Base encode config file and store it in github secrets: $cat ~/.kube/config | base64):
-    - name: Create Kubeconfig
-      run: |-
-        mkdir -p ${HOME}/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
-        # cat ${HOME}/.kube/config
 
 
-# Set Kube config context
-    - name: Use context
-      run: kubectl config use-context $KUBE_CONTEXT
-
-
+# Dockerize
+  dockerize:
+    name: Setup, Build, Publish, and Deploy
+    needs: setup-build-publish-deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the branch ${{ GITHUB.REF }}'
+      uses: actions/checkout@v2    
 # Create Dockerconfig
     - name: Create Dockerconfig
       run: |-
@@ -116,11 +113,7 @@ jobs:
         # chmod u+x ./kustomize
 
 
-# Create regcred secrets
-    - name: Create regcred secrets for cluster
-      run: |-
-        mkdir -p secrets
-        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
+
 
 
 # # Deploy the Docker image to the Kubernetes cluster
@@ -141,7 +134,25 @@ jobs:
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
-    
+
+# Setup Kube config credentials (Base encode config file and store it in github secrets: $cat ~/.kube/config | base64):
+    - name: Create Kubeconfig
+      run: |-
+        mkdir -p ${HOME}/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ${HOME}/.kube/config
+        # cat ${HOME}/.kube/config
+
+
+# Set Kube config context
+    - name: Use context
+      run: kubectl config use-context $KUBE_CONTEXT
+
+# Create regcred secrets
+    - name: Create regcred secrets for cluster
+      run: |-
+        mkdir -p secrets
+        echo "${{ secrets.DOCKER_CONFIG }}" | base64 --decode > secrets/.dockerconfigjson  
+            
 # Deploy the Docker image to the Kubernetes cluster
     - name: Deploy
       run: |-
