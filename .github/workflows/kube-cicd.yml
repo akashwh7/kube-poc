@@ -34,7 +34,7 @@ on:
         
 
 env:
-  DEPLOYMENT_NAME: hello-world-deployment # TODO: update deployment name
+  DEPLOYMENT_NAME: hello-world-app # TODO: update deployment name
   IMAGE: hello-world # TODO: update to image name
   REPO: krogerpoc.jfrog.io/kube-poc-docker #TODO: Update full repo name
   KUBE_CONTEXT: kube-poc
