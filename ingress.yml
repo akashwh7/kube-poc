@@ -15,7 +15,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: twenty-forty-eight-svc
+            name: hellosvc
             port:
               number: 80
       - path: /v2
