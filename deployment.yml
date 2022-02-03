@@ -1,11 +1,11 @@
-# Sample Deployment: Deploys a Sample 2048 game app
+# Sample Deployment: Deploys a Sample hello-world game app
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: 2048-app
+    name: hello-world-app
     labels:
-        app: "2048"
+        app: "hello-world"
 spec:
     replicas: 3
     strategy:
@@ -15,14 +15,14 @@ spec:
         maxUnavailable: 1
     selector:
         matchLabels:
-            app: "2048"
+            app: "hello-world"
     template:
         metadata:
             labels:
-                app: "2048"
+                app: "hello-world"
         spec:
             containers:
-            - name: "2048-game"
+            - name: "hello-world-game"
               image: REPO/IMAGE:TAG # This field gets updated by Kustomization.
               ports:
                 - containerPort: 80
