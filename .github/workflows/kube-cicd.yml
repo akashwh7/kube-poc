@@ -118,7 +118,7 @@ jobs:
         curl -L https://github.com/aquasecurity/trivy/releases/download/v0.19.2/trivy_0.19.2_Linux-64bit.tar.gz | tar xvzf - contrib trivy
         chmod 755 trivy
         mv trivy /usr/local/bin/trivy
-        docker run "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.GITHUB_SHA }}"
+        docker run "$REPO/$IMAGE:$GITHUB_SHA"
         trivy image --format template --template "@contrib/sarif.tpl" --output trivy-results.sarif "${{ env.REPO }}/${{ env.IMAGE }}:${{ env.GITHUB_SHA }}""
 
 # Job 4: Deploy to Prod    
