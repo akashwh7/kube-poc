@@ -44,15 +44,15 @@ env:
   # GKE_ZONE: asia-south1-a   # TODO: update to cluster zone
 
 jobs:
-# Job 1: Setup, Build
+  # Job 1: Setup, Build
   setup-build:
     name: Setup, Build
     runs-on: ubuntu-latest
     # environment: production
 
-# Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-# Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
 
@@ -95,7 +95,10 @@ jobs:
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
-          
+    # Push the Docker image to JFROG Artifactory Container Registry
+    - name: Publish
+      run: |-
+        docker push "$REPO/$IMAGE:$GITHUB_SHA"          
           
     # Push the Docker image to JFROG Artifactory Container Registry
     - name: Publish
