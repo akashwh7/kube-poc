@@ -95,6 +95,7 @@ jobs:
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
+        docker ps
           
 # Push the Docker image to JFROG Artifactory Container Registry
     - name: Publish
@@ -126,7 +127,7 @@ jobs:
   deploy-to-prod:
     name: Deploy to dev k8s cluster
     runs-on: ubuntu-latest
-    needs: dockerize
+    needs: trivy-vulnerability-scan
     environment: production
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
