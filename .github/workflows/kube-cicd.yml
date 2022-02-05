@@ -37,7 +37,7 @@ on:
 env:
   DEPLOYMENT_NAME: 2048-app # TODO: update deployment name
   IMAGE: 2048 # TODO: update to image name
-  REPO: kubepoc.jfrog.io/default-docker-virtual #TODO: Update full repo name
+  REPO: krogerpoc.jfrog.io/kube-poc-docker #TODO: Update full repo name
   KUBE_CONTEXT: kube-poc
   # GKE_PROJECT_ID: ${{ secrets.GKE_PROJECT_ID }} # TODO Update GKE Project ID
   # GKE_CLUSTER: kube-cluster    # TODO: update to cluster name
