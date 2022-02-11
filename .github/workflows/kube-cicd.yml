@@ -106,31 +106,11 @@ jobs:
         docker push "$REPO/$IMAGE:$GITHUB_SHA"
 
 
-  # Job 3: Vulnerability scan using Trivy
-  trivy-vulnerability-scan:
-    name: Vulnerability scan using trivy
-    runs-on: ubuntu-latest
-    needs: dockerize
-    environment: production
-    steps:
-    - name: Checkout the branch ${{ GITHUB.REF }}'
-      uses: actions/checkout@v2
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: ${{ env.REPO }}/${{ env.IMAGE }}:${{ env.GITHUB_SHA }}
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-
-  # Job 4: Deploy to Prod    
+  # Job 3: Deploy to Prod    
   deploy-to-prod:
     name: Deploy to dev k8s cluster
     runs-on: ubuntu-latest
-    needs: trivy-vulnerability-scan
+    needs: dockerize
     environment: production
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
@@ -156,10 +136,11 @@ jobs:
     # Set up kustomize
     - name: Set up Kustomize
       run: |-
-        # The following script detects your OS and downloads the appropriate kustomize binary to your current working directory.
+        # The following script detects your OS and downloads the appropriate latest kustomize binary to your current working directory.
         curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
         # The following script downloads the specified kustomize binary version to your current working directory.
-        # curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+        # wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.2/kustomize_v4.5.2_linux_amd64.tar.gz
+        # tar -xvzf kustomize_v4.5.2_linux_amd64.tar.gz
         # chmod u+x ./kustomize
 
     # Deploy the Docker image to the Kubernetes cluster
