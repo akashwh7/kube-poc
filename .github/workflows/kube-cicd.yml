@@ -28,10 +28,10 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - test1
+      - main
   pull_request:
     branches:
-      - test1
+      - main
         
 
 env:
