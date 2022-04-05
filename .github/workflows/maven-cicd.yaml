@@ -23,12 +23,12 @@ on:
 
 # Environment variables to be used in the workflow execution  
 env:
-  RT_CONTEXTURL: https://artifactory.example.com/artifactory # For getting Maven Packages
+  ARTIFACTORY_URL: https://artifactory.example.com/ # For getting Maven Packages
   DOCKER_REPO: sample-app #TODO
   APP_NAME: sample-app #TODO
   APP_NAMESPACE: sample-app-ns #TODO
   APP_TAG: ${{ github.sha }}
-  BASE_REPO: exampletechnology-docker.jfrog.io #TODO
+  BASE_REPO: kube-poc.jfrog.io #TODO
 
 # Jobs: One or more jobs make up a workflow run. Jobs describe the functionality that will be executed in the process and, by default, run in parallel.
 jobs:
@@ -59,9 +59,9 @@ jobs:
       - name: Configure Maven
         uses: whelk-io/maven-settings-xml-action@v14
         with:
-          repositories: '[{ "id": "example-software-engineering", "url": "${{ env.RT_CONTEXTURL }}/example-software-engineering", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" }}, { "id": "example-software-engr-snap", "url": "${{ env.RT_CONTEXTURL }}/example-software-engr-snap", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}, { "id": "example-qa", "url": "${{ env.RT_CONTEXTURL }}/example-qa", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "artcentral", "url": "${{ env.RT_CONTEXTURL }}/libs-release", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "artsnapshots", "url": "${{ env.RT_CONTEXTURL }}/libs-snapshot", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}, { "id": "remote-repos", "url": "${{ env.RT_CONTEXTURL }}/remote-repos", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}]'
-          plugin_repositories: '[{ "id": "plugins-release", "name": "plugins-release", "url": "${{ env.RT_CONTEXTURL }}/plugins-release", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "plugins-snapshot", "name": "plugins-snapshot", "url": "${{ env.RT_CONTEXTURL }}/plugins-snapshot", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}]'
-          mirrors: '[{ "id": "repo1", "mirrorOf": "*,!example-software-engineering,!example-software-engr-snap,!example-qa,!artcentral,!artsnapshots,!remote-repos,!plugins-release,!plugins-snapshot", "url": "${{ env.RT_CONTEXTURL }}/repo1" }]'
+          repositories: '[{ "id": "example-software-engineering", "url": "${{ env.ARTIFACTORY_URL }}/example-software-engineering", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" }}]'
+          plugin_repositories: '[{ "id": "plugins-release", "name": "plugins-release", "url": "${{ env.ARTIFACTORY_URL }}/plugins-release", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}]'
+          mirrors: '[{ "id": "repo1", "mirrorOf": "*,!example-software-engineering,!example-software-engr-snap,!example-qa,!artcentral,!artsnapshots,!remote-repos,!plugins-release,!plugins-snapshot", "url": "${{ env.ARTIFACTORY_URL }}/repo1" }]'
           
       # Maven Build: Build Maven project and generate JAR artifact. Code must be in sample-app directory.
       - name: Maven Build
@@ -142,6 +142,6 @@ jobs:
         run: |
           cd kube # Change directory
           ./kustomize edit set image REPO/IMAGE:TAG=${{ env.BASE_REPO }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.APP_TAG }} # Patches deployment image name with variables
-          ./kustomize build . | kubectl apply -f - # Builds manifest and applies on the k8s cluster
+          ./kustomize build . | kubectl --kubeconfig /tmp/config apply -f - # Builds manifest and applies on the k8s cluster
           #kubectl rollout status deployment/${{ env.APP_NAME }} -n ${{ env.APP_NAMESPACE }} # Checks deployment rollout status and displays in workflow run logs
           kubectl get services -o wide -n ${{ env.APP_NAMESPACE }} # Checks services created and displays in workflow run logs
