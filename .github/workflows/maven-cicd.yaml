@@ -35,7 +35,7 @@ jobs:
   # Job 1: Build - Setup JDK, Maven and Build the artifact
   build:
     name: Setup and build Maven Project
-    runs-on: [ self-hosted, kubernetes, on-prem ] # Runner: A runner is a container that runs the Github Actions runner program. Runners can be hosted on Github or self-hosted on your own machines/servers.
+    runs-on: ubuntu-latest # Runner: A runner is a container that runs the Github Actions runner program. Runners can be hosted on Github or self-hosted on your own machines/servers.
     if: github.ref == 'refs/heads/dev/mavenspringboot' # This if condition makes sure below steps are executed only if the code is pushed to "dev/mavenspringboot" branch.
     steps: # Step: A step is a set of tasks that can be executed by a job. Steps can run commands or actions. 
       # Code checkout: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
@@ -79,7 +79,7 @@ jobs:
   dockerize:
     name: Build, Tag and Push Docker image
     needs: [ build ]
-    runs-on: [ self-hosted, kubernetes, on-prem ]
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev/mavenspringboot'
     steps:
       # Code checkout
@@ -115,7 +115,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to Kubernetes dev
     needs: dockerize
-    runs-on: [self-hosted, tsa]
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev/mavenspringboot'
     environment:
       name: dev
