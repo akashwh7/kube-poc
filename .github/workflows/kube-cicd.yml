@@ -48,6 +48,7 @@ jobs:
   setup-build:
     name: Setup, Build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/main') # Ensures code is executed for the correct branch.
     # environment: production
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -76,6 +77,7 @@ jobs:
     name: Dockerize
     needs: setup-build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/main')
     steps:
     - name: Checkout the branch ${{ GITHUB.REF }}'
       uses: actions/checkout@v2
@@ -100,16 +102,13 @@ jobs:
       run: |-
         docker push "$REPO/$IMAGE:$GITHUB_SHA"          
           
-    # Push the Docker image to JFROG Artifactory Container Registry
-    - name: Publish
-      run: |-
-        docker push "$REPO/$IMAGE:$GITHUB_SHA"
 
 
   # Job 3: Deploy to Prod    
   deploy-to-prod:
     name: Deploy to dev k8s cluster
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/main')
     needs: dockerize
     environment: production
     steps:

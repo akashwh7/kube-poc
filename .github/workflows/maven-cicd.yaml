@@ -1,0 +1,147 @@
+ # This workflow will build a docker container, publish it to Jfrog Artifactory Registry, and deploy it to Kubernetes Cluster when there is a push to the specified branch (main branch).
+#
+# To configure this workflow:
+#
+# [Pre-requisites]
+# 1. Create Kubeconfig with IP, tls settings, context (username, cluster-name, namespace) and base64 encode config file to store it as a secret in KUBE_CONFIG
+#
+# 2. Ensure that KUBE_CONFIG, DOCKER_USERNAME and DOCKER_PASSWORD github secrets have been added to the repo.
+#    # Disable cert checking for the dev cluster entry
+#    kubectl config set-cluster default --insecure-skip-tls-verify=true
+
+# Workflow START -->
+
+# Name: The name of your workflow that is displayed on the Github actions page
+name: CI-CD
+
+# Event trigger: Events are specific activities that trigger a workflow run. For example, a workflow is triggered when someone pushes to the branch dev/mavenspringboot
+on:
+  push:
+    branches:
+      - dev/mavenspringboot
+  workflow_dispatch:
+
+# Environment variables to be used in the workflow execution  
+env:
+  RT_CONTEXTURL: https://artifactory.example.com/artifactory # For getting Maven Packages
+  DOCKER_REPO: sample-app #TODO
+  APP_NAME: sample-app #TODO
+  APP_NAMESPACE: sample-app-ns #TODO
+  APP_TAG: ${{ github.sha }}
+  BASE_REPO: exampletechnology-docker.jfrog.io #TODO
+
+# Jobs: One or more jobs make up a workflow run. Jobs describe the functionality that will be executed in the process and, by default, run in parallel.
+jobs:
+  # Job 1: Build - Setup JDK, Maven and Build the artifact
+  build:
+    name: Setup and build Maven Project
+    runs-on: [ self-hosted, kubernetes, on-prem ] # Runner: A runner is a container that runs the Github Actions runner program. Runners can be hosted on Github or self-hosted on your own machines/servers.
+    if: github.ref == 'refs/heads/dev/mavenspringboot' # This if condition makes sure below steps are executed only if the code is pushed to "dev/mavenspringboot" branch.
+    steps: # Step: A step is a set of tasks that can be executed by a job. Steps can run commands or actions. 
+      # Code checkout: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: 'Checkout the branch: ${{ github.REF }}'
+        uses: actions/checkout@v2
+
+      # Set up JDK    
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      # Set up Maven   
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.2
+        with:
+          maven-version: 3.8.2
+    
+      # Configure Maven: Configure Maven to fetch required packages from example repositories.
+      - name: Configure Maven
+        uses: whelk-io/maven-settings-xml-action@v14
+        with:
+          repositories: '[{ "id": "example-software-engineering", "url": "${{ env.RT_CONTEXTURL }}/example-software-engineering", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" }}, { "id": "example-software-engr-snap", "url": "${{ env.RT_CONTEXTURL }}/example-software-engr-snap", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}, { "id": "example-qa", "url": "${{ env.RT_CONTEXTURL }}/example-qa", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "artcentral", "url": "${{ env.RT_CONTEXTURL }}/libs-release", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "artsnapshots", "url": "${{ env.RT_CONTEXTURL }}/libs-snapshot", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}, { "id": "remote-repos", "url": "${{ env.RT_CONTEXTURL }}/remote-repos", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}]'
+          plugin_repositories: '[{ "id": "plugins-release", "name": "plugins-release", "url": "${{ env.RT_CONTEXTURL }}/plugins-release", "releases": { "enabled": "true" }, "snapshots": { "enabled": "false" }}, { "id": "plugins-snapshot", "name": "plugins-snapshot", "url": "${{ env.RT_CONTEXTURL }}/plugins-snapshot", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" }}]'
+          mirrors: '[{ "id": "repo1", "mirrorOf": "*,!example-software-engineering,!example-software-engr-snap,!example-qa,!artcentral,!artsnapshots,!remote-repos,!plugins-release,!plugins-snapshot", "url": "${{ env.RT_CONTEXTURL }}/repo1" }]'
+          
+      # Maven Build: Build Maven project and generate JAR artifact. Code must be in sample-app directory.
+      - name: Maven Build
+        run: mvn -B package --file sample-app/pom.xml
+
+      # Upload jar to Github artifact
+      - run: mkdir -p sample-app/target
+      - name: upload jar
+        uses: actions/upload-artifact@v2
+        with:
+          name: jarpack
+          path: sample-app/target/*.jar
+
+  # Job 2: Dockerize - Build Docker image and push it to artifactory
+  dockerize:
+    name: Build, Tag and Push Docker image
+    needs: [ build ]
+    runs-on: [ self-hosted, kubernetes, on-prem ]
+    if: github.ref == 'refs/heads/dev/mavenspringboot'
+    steps:
+      # Code checkout
+      - name: 'Checkout the branch: ${{ github.REF }}'
+        uses: actions/checkout@v2
+
+      # Download jar from Github artifact (which we uploaded in previous step)
+      - name: download jar
+        uses: actions/download-artifact@v2
+        with:
+          name: jarpack
+          path: sample-app/jar
+
+       # Build Docker image using the Dockerfile
+      - name: Build Docker image
+        run: |
+          docker build -f Dockerfile \
+          --build-arg FILE=sample-app/jar/*.jar \
+          --tag ${{ env.BASE_REPO }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.APP_TAG }} \
+          .    
+
+      # Docker login
+      - name: Docker login
+        run: |
+          docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" ${{ env.BASE_REPO }}
+        
+      # Push docker image to artifactory
+      - name: Push Docker image to artifactory
+        run: |
+          docker push ${{ env.BASE_REPO }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.APP_TAG }}
+  
+  # Job 3: Deploy - Deploy to Kubernetes
+  deploy-to-dev:
+    name: Deploy to Kubernetes dev
+    needs: dockerize
+    runs-on: [self-hosted, tsa]
+    if: github.ref == 'refs/heads/dev/mavenspringboot'
+    environment:
+      name: dev
+    steps:
+      # Code checkout
+      - name: 'Checkout the branch: ${{ github.REF }}'
+        uses: actions/checkout@v2
+
+      # Set up kustomize: Sets up kustomize
+      - name: Set up Kustomize
+        run: |-
+          cd kube
+          # curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize        
+
+      # Set up Kubeconfig: Used for K8s Cluster access. Base encode config file and store it in github secrets as KUBE_CONFIG for example on linux: $cat ~/.kube/config | base64
+      - name: Setup Kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > /tmp/config
+
+      # Deploy: deploys to RKE2 cluster
+      - name: Deploy to dev RKE2 Cluster
+        run: |
+          cd kube # Change directory
+          ./kustomize edit set image REPO/IMAGE:TAG=${{ env.BASE_REPO }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.APP_TAG }} # Patches deployment image name with variables
+          ./kustomize build . | kubectl apply -f - # Builds manifest and applies on the k8s cluster
+          #kubectl rollout status deployment/${{ env.APP_NAME }} -n ${{ env.APP_NAMESPACE }} # Checks deployment rollout status and displays in workflow run logs
+          kubectl get services -o wide -n ${{ env.APP_NAMESPACE }} # Checks services created and displays in workflow run logs

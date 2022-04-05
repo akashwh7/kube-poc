@@ -1,0 +1,18 @@
+FROM openjdk:11-jre-slim
+
+# Exposes port 8089 for the container
+EXPOSE 8089
+
+# Takes the JAR file as Argument in docker build
+ARG FILE
+ENV JAR_FILE=$FILE
+
+# Sets working directory 
+WORKDIR /app
+
+# Copies JAR artifact to the working directory
+COPY $JAR_FILE sample-app.jar
+
+# Command / Entrypoint to start the service
+# ENTRYPOINT ["java","-jar","sample-app.jar"]
+CMD ["java","-jar","sample-app.jar"]
