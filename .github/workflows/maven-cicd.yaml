@@ -110,6 +110,13 @@ jobs:
       - name: Push Docker image to artifactory
         run: |
           docker push ${{ env.BASE_REPO }}/${{ env.DOCKER_REPO }}/${{ env.APP_NAME }}:${{ env.APP_TAG }}
+
+      # # Credentials
+      # - name: Check for credentials - Dev env
+      #   if: contains(github.ref, 'dev')
+      #   run: |-
+      #     echo "auth="`echo ${{ secrets.GCP_SA_KEY_DEV }}`"" >> GITHUB_ENV
+      #     echo "project="`echo <PROJECT_ID>`"" >> GITHUB_ENV
   
   # Job 3: Deploy - Deploy to Kubernetes
   deploy-to-dev:
@@ -145,3 +152,4 @@ jobs:
           ./kustomize build . | kubectl --kubeconfig /tmp/config apply -f - # Builds manifest and applies on the k8s cluster
           #kubectl rollout status deployment/${{ env.APP_NAME }} -n ${{ env.APP_NAMESPACE }} # Checks deployment rollout status and displays in workflow run logs
           kubectl get services -o wide -n ${{ env.APP_NAMESPACE }} # Checks services created and displays in workflow run logs
+
